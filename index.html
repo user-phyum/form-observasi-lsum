@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lembar Observasi Pengoperasian Alat Uji - Karakterisasi Material</title>
+    <!-- Favicon -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/id/7/73/Lambang_Universitas_Negeri_Malang.jpg?utm_source=id.wikipedia.org&utm_campaign=index&utm_content=original" type="image/jpeg">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- docx.js library for generating clean DOCX files -->
+    <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Hide video when camera is off */
+        .video-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-12">
+
+    <!-- Header / Navbar -->
+    <header class="bg-blue-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <img id="app-logo" src="https://upload.wikimedia.org/wikipedia/id/7/73/Lambang_Universitas_Negeri_Malang.jpg?utm_source=id.wikipedia.org&utm_campaign=index&utm_content=original" 
+                     alt="Logo UM" class="w-14 h-14 bg-white rounded-full p-1 object-contain shadow-md"
+                     crossorigin="anonymous">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-wide">Lembar Observasi Pengoperasian Alat Uji</h1>
+                    <p class="text-blue-200 text-sm font-medium">Mata Kuliah: Karakterisasi Material</p>
+                </div>
+            </div>
+            <div class="text-right text-xs md:text-sm text-blue-100 bg-blue-800/60 px-3 py-1.5 rounded-lg border border-blue-700">
+                <i class="fa-regular fa-clock mr-1"></i> <span id="live-clock">--/--/---- --:--:--</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Column: Input Form (5 cols) -->
+        <section class="lg:col-span-5 space-y-6">
+            
+            <!-- Card 1: Identitas & Alat Uji -->
+            <div class="bg-white rounded-xl shadow-md p-6 border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center border-b pb-2">
+                    <i class="fa-solid fa-users text-blue-600 mr-2"></i> Identitas Observasi
+                </h2>
+
+                <!-- Tanggal & Kota -->
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Lokasi & Waktu Visitasi</label>
+                    <div class="bg-slate-50 p-2.5 rounded-lg border text-sm text-slate-700 flex justify-between items-center">
+                        <span class="font-medium"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> Malang</span>
+                        <span id="current-datetime-display" class="text-xs text-slate-500 font-mono">--/--/---- --:--:--</span>
+                    </div>
+                </div>
+
+                <!-- Nama & NIM Mahasiswa (Dynamic) -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase">Daftar Mahasiswa Observasi</label>
+                        <button type="button" id="btn-add-student" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold py-1 px-2.5 rounded-lg border border-blue-200 transition flex items-center gap-1">
+                            <i class="fa-solid fa-user-plus"></i> Tambah
+                        </button>
+                    </div>
+                    
+                    <div id="students-container" class="space-y-3">
+                        <!-- Default Student Row 1 -->
+                        <div class="student-row bg-slate-50 p-3 rounded-lg border border-slate-200 relative group">
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                                <div class="sm:col-span-7">
+                                    <input type="text" class="student-name w-full text-xs p-2 rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Nama Mahasiswa">
+                                </div>
+                                <div class="sm:col-span-5">
+                                    <input type="text" class="student-nim w-full text-xs p-2 rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" placeholder="NIM">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown Nama Alat Uji -->
+                <div class="mb-2">
+                    <label for="select-equipment" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Alat Uji Observasi</label>
+                    <select id="select-equipment" class="w-full text-sm p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white font-medium text-slate-700">
+                        <option value="" disabled selected>-- Pilih Alat Uji --</option>
+                        <option value="X-Ray Diffraction (XRD)">X-Ray Diffraction (XRD)</option>
+                        <option value="Scanning Electron Microscopy (SEM)">Scanning Electron Microscopy (SEM)</option>
+                        <option value="UV-Vis Spectrophotometer">UV-Vis Spectrophotometer</option>
+                        <option value="Fourier Transform Infrared Spectroscopy (FTIR)">Fourier Transform Infrared Spectroscopy (FTIR)</option>
+                        <option value="Ellipsometer">Ellipsometer</option>
+                        <option value="X-Ray Fluorescence (XRF)">X-Ray Fluorescence (XRF)</option>
+                        <option value="Atomic Absorption Spectroscopy (AAS)">Atomic Absorption Spectroscopy (AAS)</option>
+                        <option value="Raman Spectroscopy">Raman Spectroscopy</option>
+                        <option value="Thermogravimetric Analysis (TGA)">Thermogravimetric Analysis (TGA)</option>
+                        <option value="Differential Scanning Calorimetry (DSC)">Differential Scanning Calorimetry (DSC)</option>
+                        <option value="Lainnya">Lainnya (Tulis Manual)</option>
+                    </select>
+                    <input type="text" id="custom-equipment" class="w-full text-sm p-2.5 rounded-lg border border-slate-300 mt-2 hidden" placeholder="Masukkan nama alat uji lainnya...">
+                </div>
+
+            </div>
+
+            <!-- Card 2: Pengambil Foto & Deskripsi Dokumentasi -->
+            <div class="bg-white rounded-xl shadow-md p-6 border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center border-b pb-2">
+                    <i class="fa-solid fa-camera text-blue-600 mr-2"></i> Ambik Dokumentasi Bagian Alat
+                </h2>
+
+                <!-- Dynamic Mode Selector: Camera or File Upload -->
+                <div class="space-y-4">
+                    
+                    <!-- Camera Box with Adaptive Aspect Ratio -->
+                    <div class="bg-slate-900 rounded-lg overflow-hidden relative min-h-[260px] max-h-[400px] flex flex-col items-center justify-center p-2">
+                        <!-- Video Stream -->
+                        <video id="webcam-stream" autoplay playsinline class="w-full max-h-[380px] object-contain video-hidden rounded"></video>
+                        
+                        <!-- Image Preview Slot for Upload / Captured Photo -->
+                        <img id="photo-preview" class="w-full max-h-[380px] object-contain hidden rounded" src="" alt="Preview Foto">
+
+                        <!-- Default Empty Camera State -->
+                        <div id="camera-placeholder" class="text-center p-6 text-slate-400">
+                            <i class="fa-solid fa-video-slash text-4xl mb-2"></i>
+                            <p class="text-xs">Kamera non-aktif. Aktifkan kamera atau unggah berkas foto dari folder.</p>
+                            <p class="text-[10px] text-slate-500 mt-1">Mendukung kamera Mode Portrait & Landscape</p>
+                        </div>
+                    </div>
+
+                    <!-- Controls for Camera / File Upload -->
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" id="btn-toggle-camera" class="flex-1 text-xs bg-slate-700 hover:bg-slate-800 text-white font-medium py-2 px-3 rounded-lg transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-power-off"></i> <span id="camera-btn-text">Aktifkan Kamera</span>
+                        </button>
+                        
+                        <button type="button" id="btn-capture" class="hidden text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-lg transition items-center justify-center gap-1">
+                            <i class="fa-solid fa-circle-dot"></i> Ambil Foto
+                        </button>
+
+                        <label class="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 rounded-lg transition flex items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-folder-open"></i> Upload File
+                            <input type="file" id="file-input" accept="image/*" class="hidden">
+                        </label>
+                    </div>
+
+                    <!-- Input Deskripsi Bagian Alat -->
+                    <div class="mt-4">
+                        <label for="doc-description" class="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                            Deskripsi Bagian Alat, Fungsi & Prinsip Kerja
+                        </label>
+                        <textarea id="doc-description" rows="4" class="w-full text-xs p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Jelaskan nama bagian alat yang difoto, fungsinya, serta bagaimana prinsip kerjanya secara ringkas..."></textarea>
+                    </div>
+
+                    <!-- Button Add Item to List -->
+                    <button type="button" id="btn-add-doc-item" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded-lg shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> Tambah Ke List Dokumentasi
+                    </button>
+
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- Right Column: List Dokumentasi & Pratinjau Rekap (7 cols) -->
+        <section class="lg:col-span-7 space-y-6">
+            
+            <div class="bg-white rounded-xl shadow-md p-6 border border-slate-200">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-list-check text-blue-600 mr-2"></i> Daftar Hasil Pengamatan
+                        </h2>
+                        <p class="text-xs text-slate-500">Kumpulan item foto dan penjelasan fungsi/prinsip kerja alat</p>
+                    </div>
+                    <span id="doc-count-badge" class="self-start sm:self-auto bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full">
+                        0 Item
+                    </span>
+                </div>
+
+                <!-- Render List Items -->
+                <div id="documentation-list" class="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+                    <!-- Empty State -->
+                    <div id="empty-list-state" class="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
+                        <i class="fa-solid fa-images text-4xl text-slate-300 mb-2"></i>
+                        <p class="text-sm text-slate-500 font-medium">Belum ada dokumentasi ditambahkan.</p>
+                        <p class="text-xs text-slate-400 mt-1">Gunakan form di sebelah kiri untuk mengambil foto & menambahkan penjelasan.</p>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-xs text-slate-500">
+                        <p><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> File DOCX akan memuat header, logo UM, data kelompok, tabel foto, deskripsi, serta kolom Tanda Tangan Dosen Pembina.</p>
+                    </div>
+                    <button type="button" id="btn-export-docx" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-file-word text-lg"></i> Unduh File DOCX
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Ringkasan Info Dosen -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-900 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-user-tie text-2xl text-blue-700"></i>
+                    <div>
+                        <p class="font-bold text-sm">Dosen Pembina Mata Kuliah:</p>
+                        <p class="font-medium text-blue-800">Dr. Robi Kurniawan, M.Si.</p>
+                    </div>
+                </div>
+                <div class="text-right border-l border-blue-200 pl-4">
+                    <p class="font-semibold">Format Lembar Kerja</p>
+                    <p class="text-blue-700">Pengamatan Kelompok</p>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Modal Edit Foto / File -->
+    <div id="edit-photo-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <h3 class="text-base font-bold text-slate-800 flex items-center justify-between border-b pb-2">
+                <span><i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i> Ganti / Edit Foto</span>
+                <button type="button" class="close-modal text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </h3>
+            
+            <div class="bg-slate-100 rounded-lg h-48 flex items-center justify-center overflow-hidden">
+                <img id="edit-photo-preview" src="" class="max-h-full max-w-full object-contain">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Pilih Foto Baru dari File</label>
+                <input type="file" id="edit-photo-file-input" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2 border-t">
+                <button type="button" class="close-modal text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg">Batal</button>
+                <button type="button" id="btn-save-photo-edit" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Simpan Foto Baru</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Deskripsi -->
+    <div id="edit-desc-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4">
+            <h3 class="text-base font-bold text-slate-800 flex items-center justify-between border-b pb-2">
+                <span><i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i> Edit Deskripsi & Prinsip Kerja</span>
+                <button type="button" class="close-modal text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </h3>
+            
+            <div>
+                <label for="edit-desc-text" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Deskripsi Bagian / Fungsi / Prinsip Kerja</label>
+                <textarea id="edit-desc-text" rows="5" class="w-full text-xs p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2 border-t">
+                <button type="button" class="close-modal text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg">Batal</button>
+                <button type="button" id="btn-save-desc-edit" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification / Toast Message -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 text-xs flex items-center gap-2">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-message">Pesan notifikasi</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State Application Data
+        let documentationList = [];
+        let currentStream = null;
+        let activeCapturedImageData = null;
+        let activeEditIndex = null;
+
+        const LOGO_URL = "https://upload.wikimedia.org/wikipedia/id/7/73/Lambang_Universitas_Negeri_Malang.jpg?utm_source=id.wikipedia.org&utm_campaign=index&utm_content=original";
+
+        // DOM Elements
+        const liveClockEl = document.getElementById('live-clock');
+        const currentDatetimeDisplay = document.getElementById('current-datetime-display');
+        const studentsContainer = document.getElementById('students-container');
+        const btnAddStudent = document.getElementById('btn-add-student');
+        const selectEquipment = document.getElementById('select-equipment');
+        const customEquipment = document.getElementById('custom-equipment');
+
+        const webcamStream = document.getElementById('webcam-stream');
+        const photoPreview = document.getElementById('photo-preview');
+        const cameraPlaceholder = document.getElementById('camera-placeholder');
+        const btnToggleCamera = document.getElementById('btn-toggle-camera');
+        const cameraBtnText = document.getElementById('camera-btn-text');
+        const btnCapture = document.getElementById('btn-capture');
+        const fileInput = document.getElementById('file-input');
+        const docDescription = document.getElementById('doc-description');
+        const btnAddDocItem = document.getElementById('btn-add-doc-item');
+
+        const documentationListEl = document.getElementById('documentation-list');
+        const emptyListState = document.getElementById('empty-list-state');
+        const docCountBadge = document.getElementById('doc-count-badge');
+        const btnExportDocx = document.getElementById('btn-export-docx');
+
+        // Modals
+        const editPhotoModal = document.getElementById('edit-photo-modal');
+        const editPhotoPreview = document.getElementById('edit-photo-preview');
+        const editPhotoFileInput = document.getElementById('edit-photo-file-input');
+        const btnSavePhotoEdit = document.getElementById('btn-save-photo-edit');
+
+        const editDescModal = document.getElementById('edit-desc-modal');
+        const editDescText = document.getElementById('edit-desc-text');
+        const btnSaveDescEdit = document.getElementById('btn-save-desc-edit');
+
+        // --- Clock Functions ---
+        function updateClock() {
+            const now = new Date();
+            const dateStr = String(now.getDate()).padStart(2, '0') + '/' +
+                            String(now.getMonth() + 1).padStart(2, '0') + '/' +
+                            now.getFullYear();
+            const timeStr = String(now.getHours()).padStart(2, '0') + ':' +
+                            String(now.getMinutes()).padStart(2, '0') + ':' +
+                            String(now.getSeconds()).padStart(2, '0');
+            
+            const formatted = `${dateStr} ${timeStr}`;
+            liveClockEl.textContent = formatted;
+            currentDatetimeDisplay.textContent = formatted;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- Toast Notification ---
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = msg;
+            if (isError) {
+                toastIcon.className = "fa-solid fa-circle-xmark text-red-400 text-base";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-base";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- Close Modals ---
+        function closeModals() {
+            editPhotoModal.classList.add('hidden');
+            editDescModal.classList.add('hidden');
+            activeEditIndex = null;
+        }
+
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', closeModals);
+        });
+
+        // --- Dynamic Student Form ---
+        btnAddStudent.addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'student-row bg-slate-50 p-3 rounded-lg border border-slate-200 relative group transition-all';
+            row.innerHTML = `
+                <button type="button" class="btn-remove-student absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <div class="sm:col-span-7">
+                        <input type="text" class="student-name w-full text-xs p-2 rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Nama Mahasiswa">
+                    </div>
+                    <div class="sm:col-span-5">
+                        <input type="text" class="student-nim w-full text-xs p-2 rounded border border-slate-300 focus:ring-1 focus:ring-blue-500 outline-none" placeholder="NIM">
+                    </div>
+                </div>
+            `;
+            studentsContainer.appendChild(row);
+
+            row.querySelector('.btn-remove-student').addEventListener('click', () => {
+                if (document.querySelectorAll('.student-row').length > 1) {
+                    row.remove();
+                } else {
+                    showToast("Minimal satu baris mahasiswa!", true);
+                }
+            });
+        });
+
+        // Dropdown Equipment Change
+        selectEquipment.addEventListener('change', (e) => {
+            if (e.target.value === 'Lainnya') {
+                customEquipment.classList.remove('hidden');
+                customEquipment.focus();
+            } else {
+                customEquipment.classList.add('hidden');
+            }
+        });
+
+        // --- Camera & Image Handling ---
+        btnToggleCamera.addEventListener('click', async () => {
+            if (currentStream) {
+                stopCamera();
+            } else {
+                try {
+                    currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+                    webcamStream.srcObject = currentStream;
+                    webcamStream.classList.remove('video-hidden');
+                    photoPreview.classList.add('hidden');
+                    cameraPlaceholder.classList.add('hidden');
+                    btnCapture.classList.remove('hidden');
+                    btnCapture.classList.add('flex');
+                    cameraBtnText.textContent = "Matikan Kamera";
+                    btnToggleCamera.classList.replace('bg-slate-700', 'bg-red-600');
+                    btnToggleCamera.classList.replace('hover:bg-slate-800', 'hover:bg-red-700');
+                } catch (err) {
+                    console.error("Gagal membuka kamera:", err);
+                    showToast("Gagal mengakses kamera. Periksa izin peramban Anda.", true);
+                }
+            }
+        });
+
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            webcamStream.classList.add('video-hidden');
+            btnCapture.classList.add('hidden');
+            btnCapture.classList.remove('flex');
+            cameraBtnText.textContent = "Aktifkan Kamera";
+            btnToggleCamera.classList.replace('bg-red-600', 'bg-slate-700');
+            btnToggleCamera.classList.replace('hover:bg-red-700', 'hover:bg-slate-800');
+            
+            if (!activeCapturedImageData) {
+                cameraPlaceholder.classList.remove('hidden');
+            }
+        }
+
+        btnCapture.addEventListener('click', () => {
+            if (!currentStream) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = webcamStream.videoWidth || 640;
+            canvas.height = webcamStream.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(webcamStream, 0, 0, canvas.width, canvas.height);
+
+            activeCapturedImageData = canvas.toDataURL('image/jpeg', 0.85);
+
+            photoPreview.src = activeCapturedImageData;
+            photoPreview.classList.remove('hidden');
+            
+            stopCamera();
+            showToast("Foto berhasil diambil dari kamera!");
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    activeCapturedImageData = evt.target.result;
+                    photoPreview.src = activeCapturedImageData;
+                    photoPreview.classList.remove('hidden');
+                    cameraPlaceholder.classList.add('hidden');
+                    if (currentStream) stopCamera();
+                    showToast("Foto berhasil diunggah!");
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // --- Add Documentation Item to List ---
+        btnAddDocItem.addEventListener('click', () => {
+            const descText = docDescription.value.trim();
+
+            if (!activeCapturedImageData) {
+                showToast("Silakan ambil/unggah foto dokumentasi terlebih dahulu!", true);
+                return;
+            }
+            if (!descText) {
+                showToast("Tuliskan deskripsi bagian alat, fungsi, dan prinsip kerjanya!", true);
+                return;
+            }
+
+            const docItem = {
+                id: Date.now(),
+                image: activeCapturedImageData,
+                description: descText
+            };
+
+            documentationList.push(docItem);
+            renderDocumentationList();
+
+            docDescription.value = '';
+            activeCapturedImageData = null;
+            photoPreview.src = '';
+            photoPreview.classList.add('hidden');
+            cameraPlaceholder.classList.remove('hidden');
+            fileInput.value = '';
+
+            showToast("Item dokumentasi berhasil ditambahkan!");
+        });
+
+        function renderDocumentationList() {
+            docCountBadge.textContent = `${documentationList.length} Item`;
+
+            if (documentationList.length === 0) {
+                documentationListEl.innerHTML = '';
+                documentationListEl.appendChild(emptyListState);
+                return;
+            }
+
+            documentationListEl.innerHTML = '';
+
+            documentationList.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col sm:flex-row gap-4 items-start relative group hover:border-blue-300 transition";
+                card.innerHTML = `
+                    <div class="w-full sm:w-44 h-44 bg-slate-900 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-300 relative p-1">
+                        <img src="${item.image}" alt="Foto Bagian Alat" class="w-full h-full object-contain">
+                        <button type="button" onclick="openEditPhotoModal(${index})" class="absolute bottom-1 right-1 bg-slate-900/80 hover:bg-blue-600 text-white p-1.5 rounded-md text-xs transition shadow" title="Edit / Ganti Foto">
+                            <i class="fa-solid fa-camera-rotate"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex-1 space-y-2 w-full">
+                        <div class="flex items-center justify-between border-b pb-1">
+                            <span class="text-xs font-bold text-blue-900 uppercase tracking-wider">Bagian/Dokumentasi #${index + 1}</span>
+                            <div class="flex items-center space-x-1">
+                                <button type="button" onclick="openEditDescModal(${index})" class="text-xs text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-1 rounded border border-blue-200 flex items-center gap-1">
+                                    <i class="fa-solid fa-pen"></i> Edit Deskripsi
+                                </button>
+                                <button type="button" onclick="deleteDocItem(${index})" class="text-xs text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded border border-red-200 flex items-center gap-1" title="Hapus Item">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-700 whitespace-pre-line leading-relaxed">${escapeHtml(item.description)}</p>
+                    </div>
+                `;
+                documentationListEl.appendChild(card);
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        window.deleteDocItem = function(index) {
+            documentationList.splice(index, 1);
+            renderDocumentationList();
+            showToast("Item dokumentasi dihapus!");
+        };
+
+        window.openEditPhotoModal = function(index) {
+            activeEditIndex = index;
+            editPhotoPreview.src = documentationList[index].image;
+            editPhotoFileInput.value = '';
+            editPhotoModal.classList.remove('hidden');
+        };
+
+        editPhotoFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    editPhotoPreview.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        btnSavePhotoEdit.addEventListener('click', () => {
+            if (activeEditIndex !== null && editPhotoPreview.src) {
+                documentationList[activeEditIndex].image = editPhotoPreview.src;
+                renderDocumentationList();
+                closeModals();
+                showToast("Foto berhasil diperbarui!");
+            }
+        });
+
+        window.openEditDescModal = function(index) {
+            activeEditIndex = index;
+            editDescText.value = documentationList[index].description;
+            editDescModal.classList.remove('hidden');
+        };
+
+        btnSaveDescEdit.addEventListener('click', () => {
+            const newDesc = editDescText.value.trim();
+            if (activeEditIndex !== null && newDesc) {
+                documentationList[activeEditIndex].description = newDesc;
+                renderDocumentationList();
+                closeModals();
+                showToast("Deskripsi berhasil diperbarui!");
+            }
+        });
+
+        // Helpers for DOCX Image Rendering
+        function getImageDimensions(base64Src) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function() {
+                    resolve({ width: img.naturalWidth || 640, height: img.naturalHeight || 480 });
+                };
+                img.onerror = function() {
+                    resolve({ width: 640, height: 480 });
+                };
+                img.src = base64Src;
+            });
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64.split(',')[1]);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        async function fetchImageAsArrayBuffer(url) {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            return await blob.arrayBuffer();
+        }
+
+        // --- Export to DOCX ---
+        btnExportDocx.addEventListener('click', async () => {
+            const students = [];
+            document.querySelectorAll('.student-row').forEach(row => {
+                const name = row.querySelector('.student-name').value.trim();
+                const nim = row.querySelector('.student-nim').value.trim();
+                if (name || nim) {
+                    students.push({ name: name || '-', nim: nim || '-' });
+                }
+            });
+
+            if (students.length === 0) {
+                showToast("Isi setidaknya satu nama dan NIM mahasiswa!", true);
+                return;
+            }
+
+            let selectedEquipment = selectEquipment.value;
+            if (selectedEquipment === 'Lainnya') {
+                selectedEquipment = customEquipment.value.trim();
+            }
+
+            if (!selectedEquipment) {
+                showToast("Pilih atau isi nama alat uji observasi!", true);
+                return;
+            }
+
+            if (documentationList.length === 0) {
+                showToast("Tambahkan minimal 1 item dokumentasi foto dan penjelasan!", true);
+                return;
+            }
+
+            showToast("Memproses file DOCX...");
+
+            try {
+                const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, AlignmentType, WidthType, ImageRun } = docx;
+
+                let logoBuffer;
+                try {
+                    logoBuffer = await fetchImageAsArrayBuffer(LOGO_URL);
+                } catch (e) {
+                    console.warn("Gagal memuat logo external, mengabaikan gambar logo.", e);
+                }
+
+                const studentTableRows = [
+                    new TableRow({
+                        children: [
+                            new TableCell({
+                                children: [new Paragraph({ children: [new TextRun({ text: "No", bold: true, size: 20 })], alignment: AlignmentType.CENTER })],
+                                width: { size: 8, type: WidthType.PERCENTAGE },
+                                bgMode: "E6EEF8"
+                            }),
+                            new TableCell({
+                                children: [new Paragraph({ children: [new TextRun({ text: "Nama Mahasiswa", bold: true, size: 20 })], alignment: AlignmentType.CENTER })],
+                                width: { size: 52, type: WidthType.PERCENTAGE },
+                                bgMode: "E6EEF8"
+                            }),
+                            new TableCell({
+                                children: [new Paragraph({ children: [new TextRun({ text: "NIM", bold: true, size: 20 })], alignment: AlignmentType.CENTER })],
+                                width: { size: 40, type: WidthType.PERCENTAGE },
+                                bgMode: "E6EEF8"
+                            }),
+                        ]
+                    })
+                ];
+
+                students.forEach((s, i) => {
+                    studentTableRows.push(
+                        new TableRow({
+                            children: [
+                                new TableCell({
+                                    children: [new Paragraph({ children: [new TextRun({ text: `${i + 1}`, size: 20 })], alignment: AlignmentType.CENTER })]
+                                }),
+                                new TableCell({
+                                    children: [new Paragraph({ children: [new TextRun({ text: s.name, size: 20 })] })]
+                                }),
+                                new TableCell({
+                                    children: [new Paragraph({ children: [new TextRun({ text: s.nim, size: 20 })], alignment: AlignmentType.CENTER })]
+                                }),
+                            ]
+                        })
+                    );
+                });
+
+                const docTableRows = [
+                    new TableRow({
+                        children: [
+                            new TableCell({
+                                children: [new Paragraph({ children: [new TextRun({ text: "No", bold: true, size: 20 })], alignment: AlignmentType.CENTER })],
+                                width: { size: 6, type: WidthType.PERCENTAGE },
+                                bgMode: "E6EEF8"
+                            }),
+                            new TableCell({
+                                children: [new Paragraph({ children: [new TextRun({ text: "Foto Dokumentasi", bold: true, size: 20 })], alignment: AlignmentType.CENTER })],
+                                width: { size: 44, type: WidthType.PERCENTAGE },
+                                bgMode: "E6EEF8"
+                            }),
+                            new TableCell({
+                                children: [new Paragraph({ children: [new TextRun({ text: "Deskripsi Bagian, Fungsi & Prinsip Kerja", bold: true, size: 20 })], alignment: AlignmentType.CENTER })],
+                                width: { size: 50, type: WidthType.PERCENTAGE },
+                                bgMode: "E6EEF8"
+                            }),
+                        ]
+                    })
+                ];
+
+                for (let i = 0; i < documentationList.length; i++) {
+                    const item = documentationList[i];
+                    const imgBuffer = base64ToArrayBuffer(item.image);
+                    
+                    const dims = await getImageDimensions(item.image);
+                    const aspectRatio = dims.width / dims.height;
+                    
+                    let targetWidth = 220;
+                    let targetHeight = 160;
+
+                    if (aspectRatio >= 1) {
+                        targetWidth = 220;
+                        targetHeight = Math.round(220 / aspectRatio);
+                    } else {
+                        targetHeight = 220;
+                        targetWidth = Math.round(220 * aspectRatio);
+                    }
+
+                    docTableRows.push(
+                        new TableRow({
+                            children: [
+                                new TableCell({
+                                    children: [new Paragraph({ children: [new TextRun({ text: `${i + 1}`, size: 20 })], alignment: AlignmentType.CENTER })]
+                                }),
+                                new TableCell({
+                                    children: [
+                                        new Paragraph({
+                                            children: [
+                                                new ImageRun({
+                                                    data: imgBuffer,
+                                                    transformation: { width: targetWidth, height: targetHeight }
+                                                })
+                                            ],
+                                            alignment: AlignmentType.CENTER
+                                        })
+                                    ]
+                                }),
+                                new TableCell({
+                                    children: item.description.split('\n').map(line => 
+                                        new Paragraph({
+                                            children: [new TextRun({ text: line, size: 19 })],
+                                            spacing: { after: 100 }
+                                        })
+                                    )
+                                }),
+                            ]
+                        })
+                    );
+                }
+
+                const now = new Date();
+                const dateStr = String(now.getDate()).padStart(2, '0') + '/' +
+                                String(now.getMonth() + 1).padStart(2, '0') + '/' +
+                                now.getFullYear();
+                const timeStr = String(now.getHours()).padStart(2, '0') + ':' +
+                                String(now.getMinutes()).padStart(2, '0') + ':' +
+                                String(now.getSeconds()).padStart(2, '0');
+                const fullFormattedDateTime = `${dateStr} ${timeStr}`;
+
+                const headerChildren = [];
+                if (logoBuffer) {
+                    headerChildren.push(
+                        new Paragraph({
+                            children: [
+                                new ImageRun({
+                                    data: logoBuffer,
+                                    transformation: { width: 70, height: 70 }
+                                })
+                            ],
+                            alignment: AlignmentType.CENTER
+                        })
+                    );
+                }
+
+                headerChildren.push(
+                    new Paragraph({
+                        children: [
+                            new TextRun({ text: "UNIVERSITAS NEGERI MALANG", bold: true, size: 24 })
+                        ],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { before: 100 }
+                    }),
+                    new Paragraph({
+                        children: [
+                            new TextRun({ text: "LEMBAR OBSERVASI PENGOPERASIAN ALAT UJI", bold: true, size: 26, color: "1E3A8A" })
+                        ],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { before: 100 }
+                    }),
+                    new Paragraph({
+                        children: [
+                            new TextRun({ text: "MATAKULIAH: KARAKTERISASI MATERIAL", bold: true, size: 22, color: "4B5563" })
+                        ],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 300 }
+                    })
+                );
+
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: [
+                            ...headerChildren,
+
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "A. IDENTITAS VISITASI OBSERVASI", bold: true, size: 22, color: "1E3A8A" })
+                                ],
+                                spacing: { before: 150, after: 100 }
+                            }),
+
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "Lokasi / Kota: ", bold: true, size: 20 }),
+                                    new TextRun({ text: "Malang", size: 20 }),
+                                ]
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "Waktu Pengamatan: ", bold: true, size: 20 }),
+                                    new TextRun({ text: fullFormattedDateTime, size: 20 }),
+                                ]
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "Nama Alat Uji: ", bold: true, size: 20 }),
+                                    new TextRun({ text: selectedEquipment, bold: true, size: 20, color: "0D9488" }),
+                                ],
+                                spacing: { after: 200 }
+                            }),
+
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "Anggota Kelompok Observasi:", bold: true, size: 20 })
+                                ],
+                                spacing: { after: 100 }
+                            }),
+                            new Table({
+                                rows: studentTableRows,
+                                width: { size: 100, type: WidthType.PERCENTAGE }
+                            }),
+
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "B. HASIL OBSERVASI DAN DOKUMENTASI PRINSIP KERJA ALAT", bold: true, size: 22, color: "1E3A8A" })
+                                ],
+                                spacing: { before: 300, after: 100 }
+                            }),
+                            new Table({
+                                rows: docTableRows,
+                                width: { size: 100, type: WidthType.PERCENTAGE }
+                            }),
+
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: `Malang, ${dateStr}`, size: 20 })
+                                ],
+                                alignment: AlignmentType.RIGHT,
+                                spacing: { before: 500 }
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "Dosen Pembina Mata Kuliah,", size: 20 })
+                                ],
+                                alignment: AlignmentType.RIGHT
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "", size: 20 })
+                                ],
+                                spacing: { before: 800 }
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "Dr. Robi Kurniawan, M.Si.", bold: true, underline: {}, size: 20 })
+                                ],
+                                alignment: AlignmentType.RIGHT
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({ text: "NIP. 199109072020121013", size: 19 })
+                                ],
+                                alignment: AlignmentType.RIGHT
+                            })
+                        ]
+                    }]
+                });
+
+                const blob = await Packer.toBlob(doc);
+                const fileName = `Lembar_Observasi_${selectedEquipment.replace(/[^a-zA-Z0-9]/g, '_')}_${dateStr.replace(/\//g, '-')}.docx`;
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showToast("File DOCX berhasil diunduh!");
+
+            } catch (err) {
+                console.error("Gagal mengekspor file DOCX:", err);
+                showToast("Terjadi kesalahan saat membuat file DOCX.", true);
+            }
+        });
+    </script>
+</body>
+</html>
